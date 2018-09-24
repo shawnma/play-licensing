@@ -106,9 +106,7 @@ public class MainActivity extends Activity {
                     if ( mRetry ) {
                         doCheck();
                     } else {
-                        Intent marketIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(
-                                "http://market.android.com/details?id=" + getPackageName()));
-                            startActivity(marketIntent);
+                        mChecker.showLastLicenseError(MainActivity.this);
                     }
                 }
             })

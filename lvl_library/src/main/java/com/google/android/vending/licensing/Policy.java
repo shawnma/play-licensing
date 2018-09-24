@@ -56,4 +56,9 @@ public interface Policy {
      * Check if the user should be allowed access to the application.
      */
     boolean allowAccess();
+
+    /**
+     * Gets the licensing url that displays the details error on why the app is not licensed.
+     */
+    String getLicensingUrl();
 }

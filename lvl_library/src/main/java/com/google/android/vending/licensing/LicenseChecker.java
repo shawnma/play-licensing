@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -193,6 +194,21 @@ public class LicenseChecker implements ServiceConnection {
                 runChecks();
             }
         }
+    }
+
+    /**
+     * Displays the last licensing error from server, which redirects users to a page that displays
+     * more details on why the app is not licensed. If no such URL returned from server, it will go
+     * to the details page of the app.
+     */
+    public void showLastLicenseError(Context context) {
+        String licensingUrl = mPolicy.getLicensingUrl();
+        if (licensingUrl == null) {
+            licensingUrl =
+                "https://play.google.com/store/apps/details?id=" + context.getPackageName();
+        }
+        Intent marketIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(licensingUrl));
+        context.startActivity(marketIntent);
     }
 
     private void runChecks() {

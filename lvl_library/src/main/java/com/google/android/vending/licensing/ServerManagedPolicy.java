@@ -50,6 +50,7 @@ public class ServerManagedPolicy implements Policy {
     private static final String PREF_RETRY_UNTIL = "retryUntil";
     private static final String PREF_MAX_RETRIES = "maxRetries";
     private static final String PREF_RETRY_COUNT = "retryCount";
+    private static final String PREF_LICENSING_URL = "licensingUrl";
     private static final String DEFAULT_VALIDITY_TIMESTAMP = "0";
     private static final String DEFAULT_RETRY_UNTIL = "0";
     private static final String DEFAULT_MAX_RETRIES = "0";
@@ -63,6 +64,7 @@ public class ServerManagedPolicy implements Policy {
     private long mRetryCount;
     private long mLastResponseTime = 0;
     private int mLastResponse;
+    private String mLicensingUrl;
     private PreferenceObfuscator mPreferences;
 
     /**
@@ -80,6 +82,7 @@ public class ServerManagedPolicy implements Policy {
         mRetryUntil = Long.parseLong(mPreferences.getString(PREF_RETRY_UNTIL, DEFAULT_RETRY_UNTIL));
         mMaxRetries = Long.parseLong(mPreferences.getString(PREF_MAX_RETRIES, DEFAULT_MAX_RETRIES));
         mRetryCount = Long.parseLong(mPreferences.getString(PREF_RETRY_COUNT, DEFAULT_RETRY_COUNT));
+        mLicensingUrl = mPreferences.getString(PREF_LICENSING_URL, null);
     }
 
     /**
@@ -106,9 +109,9 @@ public class ServerManagedPolicy implements Policy {
             setRetryCount(mRetryCount + 1);
         }
 
+        Map<String, String> extras = decodeExtras(rawData.extra);
         if (response == Policy.LICENSED) {
             // Update server policy data
-            Map<String, String> extras = decodeExtras(rawData.extra);
             mLastResponse = response;
             setValidityTimestamp(extras.get("VT"));
             setRetryUntil(extras.get("GT"));
@@ -118,6 +121,7 @@ public class ServerManagedPolicy implements Policy {
             setValidityTimestamp(DEFAULT_VALIDITY_TIMESTAMP);
             setRetryUntil(DEFAULT_RETRY_UNTIL);
             setMaxRetries(DEFAULT_MAX_RETRIES);
+            setLicensingUrl(extras.get("LU"));
         }
 
         setLastResponse(response);
@@ -230,6 +234,21 @@ public class ServerManagedPolicy implements Policy {
         return mMaxRetries;
     }
 
+    /**
+     * Set the license URL that displays a Play Store UI for user to purchase the app.
+     */
+    private void setLicensingUrl(String url) {
+        if (url != null) {
+            mLicensingUrl = url;
+            mPreferences.putString(PREF_LICENSING_URL, url);
+        } else {
+            mPreferences.remove(PREF_LICENSING_URL);
+        }
+    }
+
+    public String getLicensingUrl() {
+        return mLicensingUrl;
+    }
     /**
      * {@inheritDoc}
      *
